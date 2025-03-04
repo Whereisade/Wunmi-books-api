@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9pm=klnwqgi_)^+-qu61m9codgx4p4$(mj)y$qv9a^79o!xh=f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'bookings',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'omowunmi_backend.wsgi.application'
 
+CORS_ALLOWED_ORIGINS = [
+    "https://healthcare-eta-liard.vercel.app/",  
+    "http://localhost:3000",  
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
