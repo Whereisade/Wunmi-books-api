@@ -30,15 +30,15 @@ class Booking(models.Model):
 
     @property
     def total_fee(self):
-        items_total = sum((item.price for item in self.renteditem_set.all()), Decimal('0'))
+        # Multiply each rented item's price by its unit, then sum all items.
+        items_total = sum(item.price * item.unit for item in self.renteditem_set.all())
         return items_total + self.transport_cost - self.discount
-
 
 class RentedItem(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    unit = models.IntegerField(default=1)  # Now a number (quantity)
+    unit = models.IntegerField(default=1)
 
     def __str__(self):
         return f'{self.name} (x{self.unit}) - {self.price}'
