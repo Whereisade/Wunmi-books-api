@@ -30,8 +30,9 @@ class Booking(models.Model):
 
     @property
     def total_fee(self):
-        # Start the sum with a Decimal(0) to ensure the result is a Decimal.
-        items_total = sum((item.price for item in self.renteditem_set.all()), Decimal(0))
+        # Start with a Decimal zero and sum each item's price
+        items_total = sum((item.price for item in self.renteditem_set.all()), Decimal('0'))
+        # Add transport_cost and subtract discount (all kept as Decimals)
         return items_total + self.transport_cost - self.discount
 
 

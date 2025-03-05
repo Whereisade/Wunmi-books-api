@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-9pm=klnwqgi_)^+-qu61m9codgx4p4$(mj)y$qv9a^79o!xh=f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -75,7 +75,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'omowunmi_backend.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = [
-    "https://healthcare-eta-liard.vercel.app/",  
+     
     "http://localhost:3000",  
 ]
 

@@ -5,6 +5,8 @@ from .serializers import BookingSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Q
+from collections import defaultdict
+from decimal import Decimal
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
@@ -38,27 +40,18 @@ class RevenueReportView(APIView):
         return Response({"total_revenue": total_revenue})
 
 class BankFeesReportView(APIView):
-    """
-    Endpoint: GET /api/reports/bank-fees/
-    Returns total fees (sum of booking.total_fee) grouped by payment_method (bank).
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        from collections import defaultdict
-        fees_by_bank = defaultdict(float)
-
-        # Fetch all bookings
+        fees_by_bank = defaultdict(lambda: Decimal('0'))
         queryset = Booking.objects.all()
 
-        # Aggregate fees by bank
         for booking in queryset:
             fees_by_bank[booking.payment_method] += booking.total_fee
 
-        # Convert dict to list of objects
+        # Convert the Decimal values to float (or string) for JSON serialization if needed
         result = [
-            {"bank": bank, "total_fee": total_fee}
+            {"bank": bank, "total_fee": float(total_fee)}
             for bank, total_fee in fees_by_bank.items()
         ]
-
         return Response({"fees_by_bank": result})
