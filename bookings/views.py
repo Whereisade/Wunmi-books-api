@@ -9,7 +9,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 class BookingViewSet(viewsets.ModelViewSet):
-    queryset = Booking.objects.all()
+    queryset = Booking.objects.all().order_by('-delivery_date')
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 

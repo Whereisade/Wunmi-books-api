@@ -1,5 +1,6 @@
 from django.db import models
 from decimal import Decimal
+from django.utils import timezone
 
 class Booking(models.Model):
     PAYMENT_METHOD_CHOICES = [
@@ -24,6 +25,7 @@ class Booking(models.Model):
     transport_cost = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
 
     def __str__(self):
         return f'{self.client_name} - {self.delivery_date}'
