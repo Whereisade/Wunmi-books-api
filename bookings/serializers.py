@@ -2,14 +2,28 @@ from rest_framework import serializers
 from .models import Booking, RentedItem
 
 class RentedItemSerializer(serializers.ModelSerializer):
+    unit = serializers.IntegerField(default=1)
+
     class Meta:
         model = RentedItem
         fields = ['id', 'name', 'price', 'unit']
 
+    def to_representation(self, instance):
+        # Get the default representation
+        ret = super().to_representation(instance)
+        # Try to convert 'unit' to an integer; if it fails, default to 1.
+        try:
+            # If ret['unit'] is an empty string or any value that can't be cast to int,
+            # int() will raise a ValueError, and we will catch that.
+            ret['unit'] = int(ret['unit'])
+        except (ValueError, TypeError):
+            ret['unit'] = 1
+        return ret
+
 class BookingSerializer(serializers.ModelSerializer):
-    # This field is for GET requests: shows the nested rented items.
-    rented_items = RentedItemSerializer(many=True, read_only=True)
-    # This field is for write operations: use it when creating/updating bookings.
+    # For GET requests, include nested rented items by mapping the reverse relation.
+    rented_items = RentedItemSerializer(many=True, read_only=True, source='renteditem_set')
+    # For POST/PUT, use a write-only field to accept nested data.
     rented_items_data = RentedItemSerializer(many=True, write_only=True, required=False)
     total_fee = serializers.SerializerMethodField(read_only=True)
 
@@ -27,7 +41,6 @@ class BookingSerializer(serializers.ModelSerializer):
         return obj.total_fee
 
     def create(self, validated_data):
-        # Pop the write-only rented_items_data field; default to empty list if not provided.
         rented_items_data = validated_data.pop('rented_items_data', [])
         booking = Booking.objects.create(**validated_data)
         for item_data in rented_items_data:
@@ -35,14 +48,12 @@ class BookingSerializer(serializers.ModelSerializer):
         return booking
 
     def update(self, instance, validated_data):
-        # Pop the rented_items_data if provided
         rented_items_data = validated_data.pop('rented_items_data', None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
         if rented_items_data is not None:
-            # Delete all existing rented items and recreate them.
             instance.renteditem_set.all().delete()
             for item_data in rented_items_data:
                 RentedItem.objects.create(booking=instance, **item_data)
