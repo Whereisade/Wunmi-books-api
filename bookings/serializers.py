@@ -4,10 +4,9 @@ from .models import Booking, RentedItem
 class RentedItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = RentedItem
-        fields = ['id', 'name', 'price']
+        fields = ['id', 'name', 'price', 'unit']
 
 class BookingSerializer(serializers.ModelSerializer):
-    # Use a nested serializer for creating rented items
     rented_items = RentedItemSerializer(many=True, write_only=True)
     total_fee = serializers.SerializerMethodField(read_only=True)
 
@@ -37,7 +36,6 @@ class BookingSerializer(serializers.ModelSerializer):
         instance.save()
 
         if rented_items_data is not None:
-            # For simplicity, remove all rented items and re-add them
             instance.renteditem_set.all().delete()
             for item_data in rented_items_data:
                 RentedItem.objects.create(booking=instance, **item_data)
