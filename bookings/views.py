@@ -17,7 +17,9 @@ class BookingViewSet(viewsets.ModelViewSet):
 class RevenueReportView(APIView):
     """
     Endpoint: GET /api/reports/revenue/?month=...&year=...
-    Returns total revenue (sum of booking.total_fee) filtered by optional month/year.
+    Returns:
+      - total_revenue: sum of booking.total_fee (which includes rented items, transport cost, discount)
+      - total_transport_fee: sum of booking.transport_cost for all bookings in the filtered set.
     """
     permission_classes = [IsAuthenticated]
 
@@ -36,8 +38,13 @@ class RevenueReportView(APIView):
 
         # Sum up the total_fee property in Python
         total_revenue = sum(booking.total_fee for booking in queryset)
+        # Sum the transport_cost field for each booking
+        total_transport_fee = sum(booking.transport_cost for booking in queryset)
 
-        return Response({"total_revenue": total_revenue})
+        return Response({
+            "total_revenue": total_revenue,
+            "total_transport_fee": total_transport_fee
+        })
 
 class BankFeesReportView(APIView):
     permission_classes = [IsAuthenticated]
