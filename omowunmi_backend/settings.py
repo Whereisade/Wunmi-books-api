@@ -75,7 +75,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'omowunmi_backend.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = [
-    "https://wunmi-books.vercel.app/",  
+    "https://wunmi-books.vercel.app/",
+    "http://localhost:3000",  
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
