@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+import environ
+import dj_database_url
+from decouple import config
+import socket
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,6 +33,8 @@ ALLOWED_HOSTS = ['*']
 
 
 # Application definition
+
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -75,7 +81,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'omowunmi_backend.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = [
-    "https://wunmi-books.vercel.app/",
+    "https://wunmi-books.vercel.app",
     "http://localhost:3000",  
 ]
 
@@ -83,13 +89,35 @@ CORS_ALLOW_ALL_ORIGINS = False
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# socket.getaddrinfo('db.xscxfpcodxtnraebzny.supabase.co', 5432)
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+IN_PRODUCTION = config('IN_PRODUCTION', default=False, cast=bool)
+
+if IN_PRODUCTION:
+    # Production Supabase PostgreSQL settings
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'PASSWORD': config('POSTGRES_PASSWORD'),
+            'HOST': config('POSTGRES_HOST'),
+            'PORT': '5432',
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+        }
     }
-}
+else:
+    # Local development SQLite settings
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
